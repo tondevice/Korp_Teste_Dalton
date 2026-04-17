@@ -1,4 +1,4 @@
-# 🧾 Sistema de Gestão de Notas Fiscais
+# 🧾 Sistema de Gestão de Notas Fiscais — Desenvolvido por Dalton Santos
 
 Projeto desenvolvido como parte do processo seletivo de estágio da **Korp ERP**.
 
@@ -73,7 +73,7 @@ npm install -g @angular/cli
 
 ```bash
 git clone <url-do-repositorio>
-cd Korp_Case_Dalton
+cd Korp_Teste_Dalton
 ```
 
 ### Iniciar aplicação
@@ -113,7 +113,7 @@ Esse processo irá iniciar automaticamente as APIs e o frontend.
 | PUT    | /produtos/{id}                 |
 | DELETE | /produtos/{id}                 |
 | GET    | /produtos/{id}/disponibilidade |
-| POST   | /produtos/baixa                |
+| POST   | /produtos/baixas               |
 
 ### Faturamento
 
@@ -152,11 +152,13 @@ Os erros são tratados tanto no backend quanto no frontend, garantindo que falha
 * a impressão depende da disponibilidade de estoque
 * em caso de falha na comunicação entre serviços, a operação é interrompida sem afetar os dados
 * o sistema mantém a consistência mesmo em cenários de erro
-
+* a interface segue referências do padrão visual da empresa, com adaptações para o contexto do projeto
 ---
 
 ## 📄 Licença
 
 Projeto desenvolvido para fins de avaliação técnica.
 
-**Desenvolvido com muita dedicação por Dalton Santos**
+---
+
+**Desenvolvido com muita dedicação por Dalton Santos 💪**
