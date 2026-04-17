@@ -4,7 +4,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ============================================
-echo Iniciando Korp Case Dalton
+echo Iniciando Korp Teste Dalton
 echo ============================================
 
 start "Estoque API" cmd /k "cd /d ""%~dp0services\estoque-api"" && dotnet restore && dotnet run"
