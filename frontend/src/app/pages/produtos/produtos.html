@@ -1,0 +1,131 @@
+<div class="produtos-page">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        {{ produtoEmEdicaoId ? 'Editar produto' : 'Cadastro de produtos' }}
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="form-shell">
+        <div>
+          <p class="page-section-description">
+            Cadastre os produtos que podem ser usados nas notas fiscais.
+          </p>
+        </div>
+
+        <p class="feedback-error" *ngIf="mensagemErro">{{ mensagemErro }}</p>
+
+        <form
+          [formGroup]="form"
+          class="produto-form"
+          [class.validation-visible]="tentouSalvar"
+          (ngSubmit)="salvar()">
+          <div>
+            <mat-form-field appearance="outline">
+              <mat-label>Código</mat-label>
+              <input matInput formControlName="code" />
+            </mat-form-field>
+            <p class="field-error" *ngIf="exibirErroCodigo()">{{ exibirErroCodigo() }}</p>
+          </div>
+
+          <div>
+            <mat-form-field appearance="outline">
+              <mat-label>Descrição</mat-label>
+              <input matInput formControlName="description" />
+            </mat-form-field>
+            <p class="field-error" *ngIf="exibirErroDescricao()">{{ exibirErroDescricao() }}</p>
+          </div>
+
+          <div>
+            <mat-form-field appearance="outline">
+              <mat-label>Saldo</mat-label>
+              <input matInput type="number" formControlName="stock" />
+            </mat-form-field>
+            <p class="field-error" *ngIf="exibirErroSaldo()">{{ exibirErroSaldo() }}</p>
+          </div>
+
+          <div class="form-footer">
+            <button mat-raised-button color="primary" type="submit" [disabled]="salvando">
+              {{ salvando ? 'Salvando...' : produtoEmEdicaoId ? 'Atualizar produto' : 'Salvar produto' }}
+            </button>
+
+            <button
+              *ngIf="produtoEmEdicaoId"
+              mat-stroked-button
+              type="button"
+              (click)="cancelarEdicao()"
+              [disabled]="salvando">
+              Cancelar edição
+            </button>
+          </div>
+        </form>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Produtos</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <p *ngIf="carregando">Carregando produtos...</p>
+
+      <p *ngIf="!carregando && !produtos.length" class="empty-state-text">
+        Nenhum produto cadastrado até o momento.
+      </p>
+
+      <table mat-table [dataSource]="produtos" class="full-width-table" *ngIf="!carregando && produtos.length">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let produto">{{ produto.id }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="code">
+          <th mat-header-cell *matHeaderCellDef>Código</th>
+          <td mat-cell *matCellDef="let produto">
+            <span class="code-badge">{{ produto.code }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Descrição</th>
+          <td mat-cell *matCellDef="let produto">{{ produto.description }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="stock">
+          <th mat-header-cell *matHeaderCellDef>Saldo</th>
+          <td mat-cell *matCellDef="let produto">
+            <span [class]="produto.stock > 0 ? 'stock-badge stock-badge--ok' : 'stock-badge stock-badge--zero'">
+              {{ produto.stock }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Ações</th>
+          <td mat-cell *matCellDef="let produto">
+            <div class="actions-inline">
+              <button mat-button type="button" class="action-link-button" (click)="iniciarEdicao(produto)">
+                Editar
+              </button>
+
+              <button
+                mat-button
+                type="button"
+                class="action-link-button action-link-button--danger"
+                (click)="excluir(produto)"
+                [disabled]="excluindoId === produto.id">
+                {{ excluindoId === produto.id ? 'Excluindo...' : 'Excluir' }}
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

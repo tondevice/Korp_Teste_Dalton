@@ -1,0 +1,37 @@
+<header class="app-header">
+  <div class="app-header__inner">
+    <div class="app-brand">
+      <div class="app-brand__logo-wrap">
+        <img src="/logo-korp.webp" alt="Korp ERP" class="app-logo" />
+      </div>
+
+      <div class="app-brand__text">
+        <h1>Sistema de Notas Fiscais</h1>
+        <p>Integração entre estoque e faturamento</p>
+      </div>
+    </div>
+
+    <nav class="app-nav">
+      <a
+        mat-button
+        routerLink="/produtos"
+        routerLinkActive="app-nav__link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="app-nav__link">
+        Produtos
+      </a>
+
+      <a
+        mat-button
+        routerLink="/notas"
+        routerLinkActive="app-nav__link--active"
+        class="app-nav__link">
+        Notas
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main class="page-container">
+  <router-outlet></router-outlet>
+</main>

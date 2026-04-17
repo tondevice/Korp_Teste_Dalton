@@ -1,0 +1,198 @@
+<div class="notas-page">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        {{ notaEmEdicaoId ? 'Editar nota' : 'Cadastro de notas' }}
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="form-shell">
+        <div>
+          <p class="page-section-description">
+            Monte uma nota com um ou mais produtos. A impressão só é concluída quando houver estoque disponível.
+          </p>
+        </div>
+
+        <p class="feedback-error" *ngIf="mensagemErro">{{ mensagemErro }}</p>
+
+        <form
+          [formGroup]="form"
+          class="nota-form"
+          [class.validation-visible]="tentouAdicionarItem"
+          (ngSubmit)="adicionarItem()">
+          <div class="campo-produto">
+            <mat-form-field appearance="outline">
+              <mat-label>Produto</mat-label>
+              <select matNativeControl formControlName="productId">
+                <option [value]="null">Selecione um produto</option>
+                <option *ngFor="let produto of produtos" [value]="produto.id">
+                  {{ obterLabelProduto(produto) }}
+                </option>
+              </select>
+            </mat-form-field>
+            <p class="field-error" *ngIf="exibirErroProduto()">{{ exibirErroProduto() }}</p>
+          </div>
+
+          <div>
+            <mat-form-field appearance="outline">
+              <mat-label>Quantidade</mat-label>
+              <input matInput type="number" formControlName="quantity" />
+            </mat-form-field>
+            <p class="field-error" *ngIf="exibirErroQuantidade()">{{ exibirErroQuantidade() }}</p>
+          </div>
+
+          <div class="form-footer nota-form__actions">
+            <button
+              mat-stroked-button
+              color="primary"
+              type="submit"
+              [disabled]="carregandoProdutos || salvando">
+              Adicionar item
+            </button>
+          </div>
+        </form>
+
+        <p *ngIf="carregandoProdutos">Carregando produtos...</p>
+
+        <div class="korp-muted-box">
+          <h3 class="page-section-title">Itens da nota</h3>
+
+          <p *ngIf="!itensNota.length" class="empty-state-text">Nenhum item adicionado ainda.</p>
+
+          <div *ngIf="itensNota.length" class="korp-list-grid itens-nota-lista">
+            <div class="korp-list-item" *ngFor="let item of itensNota">
+              <div>
+                <strong>{{ item.productCode }} - {{ item.productDescription }}</strong>
+                <div class="item-nota__meta">Quantidade: {{ item.quantity }}</div>
+              </div>
+
+              <button
+                mat-button
+                class="action-link-button action-link-button--danger"
+                type="button"
+                (click)="removerItem(item.productId)">
+                Remover
+              </button>
+            </div>
+          </div>
+
+          <div class="form-footer salvar-nota">
+            <button mat-raised-button color="primary" type="button" (click)="salvar()" [disabled]="salvando">
+              {{ salvando ? 'Salvando...' : notaEmEdicaoId ? 'Atualizar nota' : 'Salvar nota' }}
+            </button>
+
+            <button
+              *ngIf="notaEmEdicaoId"
+              mat-stroked-button
+              type="button"
+              (click)="cancelarEdicao()"
+              [disabled]="salvando">
+              Cancelar edição
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Notas</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <p *ngIf="carregando">Carregando notas...</p>
+
+      <table mat-table [dataSource]="notas" class="full-width-table" *ngIf="!carregando">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let nota">{{ nota.id }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="number">
+          <th mat-header-cell *matHeaderCellDef>Número</th>
+          <td mat-cell *matCellDef="let nota">
+            <span class="number-badge">NF {{ nota.number }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let nota">
+            <span [class]="nota.status === 'Aberta' ? 'status-chip status-chip--open' : 'status-chip status-chip--closed'">
+              {{ nota.status }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef>Data</th>
+          <td mat-cell *matCellDef="let nota">{{ nota.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="items">
+          <th mat-header-cell *matHeaderCellDef>Itens</th>
+          <td mat-cell *matCellDef="let nota">
+            <div class="nota-items-inline">
+              <span class="nota-item-badge" *ngFor="let item of itensVisiveisNota(nota)">
+                {{ item.productCode }} - {{ item.productDescription }}
+                <strong>×{{ item.quantity }}</strong>
+              </span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Ações</th>
+          <td mat-cell *matCellDef="let nota">
+            <div class="actions-inline">
+              <button
+                *ngIf="podeEditarOuExcluir(nota)"
+                mat-button
+                type="button"
+                class="action-link-button"
+                (click)="iniciarEdicao(nota)"
+                [disabled]="imprimindoId === nota.id || excluindoId === nota.id">
+                Editar
+              </button>
+
+              <button
+                *ngIf="podeEditarOuExcluir(nota)"
+                mat-button
+                type="button"
+                class="action-link-button action-link-button--danger"
+                (click)="excluir(nota)"
+                [disabled]="excluindoId === nota.id || imprimindoId === nota.id">
+                {{ excluindoId === nota.id ? 'Excluindo...' : 'Excluir' }}
+              </button>
+
+              <button
+                *ngIf="nota.status === 'Aberta'"
+                mat-raised-button
+                color="primary"
+                type="button"
+                class="action-primary-button"
+                (click)="imprimir(nota)"
+                [disabled]="!podeImprimir(nota)">
+                {{ imprimindoId === nota.id ? 'Imprimindo...' : 'Imprimir' }}
+              </button>
+
+              <button
+                *ngIf="nota.status !== 'Aberta'"
+                mat-stroked-button
+                type="button"
+                class="action-primary-button"
+                disabled>
+                Já impressa
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

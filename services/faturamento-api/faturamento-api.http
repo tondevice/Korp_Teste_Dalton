@@ -1,0 +1,6 @@
+@faturamento_api_HostAddress = http://localhost:5133
+
+GET {{faturamento_api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
