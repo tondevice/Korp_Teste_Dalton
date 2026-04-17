@@ -58,8 +58,8 @@ Foi utilizado **SQLite** com o objetivo de simplificar a execução do projeto, 
 
 ## ⚙️ Pré-requisitos
 
-* .NET 8 SDK
-* Node.js (LTS)
+* [.NET 8 SDK](https://dotnet.microsoft.com/pt-br/download/dotnet/8.0)
+* [Node.js (LTS)](https://nodejs.org/en/download)
 
 Instalação do Angular CLI:
 
